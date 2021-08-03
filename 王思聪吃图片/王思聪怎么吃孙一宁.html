@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0
+        }
+        
+        #wsc {
+            position: fixed;
+            width: 70px;
+            bottom: 0;
+        }
+        
+        #start {
+            position: fixed;
+            width: 75px;
+            right: 0;
+            top: 0;
+        }
+        
+        #end {
+            position: fixed;
+            left: 50%;
+            top: 50%;
+            border: 5px solid black;
+            transform: translate(-50%, -50%);
+            background: sandybrown;
+            width: 300px;
+            height: 200px;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        body>span {
+            position: absolute;
+            bottom: 75px;
+            color: orange;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="count"></div>
+    <h1>还剩<span id="text1">30</span>秒，已创建【<span id="text2">0</span>】热狗，你吃了【<span id="text3">0</span>】个</h1>
+    <button id="start">开始</button>
+    <img src="./1.jpg" alt="" id="wsc">
+    <div id="end" style="display: none;">
+        <p style="font-weight: 700;  margin-bottom: 8px; font-size: 30px;">游戏结束</p>
+        <p style="font-weight: 700;  margin-bottom: 8px; font-size: 30px;" id="text4"></p>
+    </div>
+</body>
+
+</html>
+<script>
+    var start = document.querySelector('#start')
+    start.addEventListener('click', function(e) {
+        document.querySelector('#end').style.display = "none"
+        var e = e || window.event;
+        var wsc = document.querySelector('#wsc')
+        document.addEventListener("mousemove", function(e) {
+            var left1 = e.pageX - (wsc.width * 0.5); //鼠标指向王思聪中间
+            var leftMax = window.innerWidth - wsc.width; //固定不让超过屏幕之外
+            if (left1 < 0) wsc.style.left = 0;
+            else if (left1 > leftMax) wsc.style.left = leftMax + 'px';
+            else wsc.style.left = left1 + 'px';
+        })
+
+        //--------------华丽的分割线----------------------------------   
+
+        var num = countNum = 0 //统计出现的热狗数和分数
+        var createHotDog = function() {
+            document.querySelector("#text2").innerText = num++ //显示创建了几个热狗
+                var imgObj = document.createElement('img') //创建img
+            imgObj.src = './孙一宁.jpg' //img的路径
+            imgObj.width = 30 //img的宽度
+            imgObj.style.position = 'fixed' // 设置绝对定位
+                // imgObj.style.top = 0 // 设置初始高度为0
+            imgObj.setAttribute('class', 'hotdog')
+            var max = (window.innerWidth || document.documentElement.clientWidth) - imgObj.width //设置热狗出现位置的最大宽度
+            imgObj.style.left = parseInt(Math.random() * (max + 1)) + 'px' //设置随机数随机出现
+            document.body.appendChild(imgObj) //给body新增img
+            var hh = 0
+
+            clearInterval(t)
+            var t = setInterval(function() {
+                hh += 10
+                imgObj.style.top = hh + 'px'
+                if (hh >= (window.innerHeight - 30) && imgObj.parent) {
+                    document.body.removeChild(imgObj);
+                    clearInterval(t);
+                }
+                // if(time == 0 ){
+                //     clearInterval(t);
+                // }这也是一种解决办法
+                // console.log(wsc.offsetLeft, 1); //这个显示的是数值
+                // console.log(wsc.style.left, 2);//这个显示的是数值+px
+                var x = Math.abs(wsc.offsetLeft - imgObj.offsetLeft);
+                var y = Math.abs(wsc.offsetTop - hh)
+                if (x <= 70 && y <= 30) {
+                    document.body.removeChild(imgObj);
+                    document.querySelector("#text3").innerText = ++countNum
+                    var score = document.createElement('span'); //从这里开始是cv的
+                    score.innerText = '+1';
+                    score.style.left = wsc.offsetLeft + 80 + 'px';
+                    score.style.fontSize = '30px';
+                    document.body.appendChild(score);
+                    setTimeout(function() {
+                        document.body.removeChild(score);
+                    }, 500);
+                    clearInterval(t);
+                }
+            }, 30)
+        }
+        var time = 30
+        var t1 = setInterval(function() {
+            createHotDog()
+        }, 1000)
+        var t2 = setInterval(function() {
+                document.querySelector("#text1").innerText = --time
+                if (time <= 0) {
+                    clearInterval(t1)
+                    var clean1 = document.querySelectorAll('.hotdog')
+                    clean1.forEach(function(item, index) {
+                        document.body.removeChild(clean1[index])
+                    })
+                    document.querySelector("#text4").innerText = countNum + '分'
+                    document.querySelector('#end').style.display = "flex"
+
+                    clearInterval(t2)
+                }
+            }, 1000) //当倒计时结束，清除所有的定时器
+            //--------------华丽的分割线----------------------------------  
+            //此处我又发现了一个bug，如果在边缘处吃孙一宁，会出现滚动条，原因xxx
+    })
+</script>
